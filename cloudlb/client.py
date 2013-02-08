@@ -112,35 +112,29 @@ class CLBClient(httplib2.Http):
         if 'PYTHON_CLOUDLB_DEBUG' in os.environ:
             sys.stderr.write("RETURNED HEADERS: %s\n" % (str(response)))
         # If we hit a 413 (Request Limit) response code,
-        # check to see how long we have to wait.
-        # If you have to wait more then 10 seconds,
-        # raise ResponseError with a more sane message then CLB provides
+        # raise ResponseError with a wait time == how long we have to wait
         if response.status == 413:
             if 'PYTHON_CLOUDLB_DEBUG' in os.environ:
                 sys.stderr.write("(413) BODY:")
                 pp.pprint(body)
-            now = datetime.datetime.strptime(response['date'],
-                    '%a, %d %b %Y %H:%M:%S %Z')
+            # A 413 response no longer seems to have a data attribute, so
+            # we'll just use the local time instead.
+            now = datetime.datetime.now()
             # Retry-After header now doesn't always return a timestamp, 
-            # try parsing the timestamp, if that fails wait 5 seconds 
-            # and try again.  If it succeeds figure out how long to wait
+            # try parsing the timestamp, if that fails raise a RateLimit error
+            # w/ 5 second wait time. If it succeeds figure out how long to wait
             try:
                 retry = datetime.datetime.strptime(response['retry-after'],
-                        '%a, %d %b %Y %H:%M:%S %Z')
+                                                   '%Y-%m-%dT%H:%M:%SZ')
             except ValueError:
-                if response['retry-after'] > '30':
+                if response['retry-after']:
                     raise cloudlb.errors.RateLimit(response['retry-after'])
                 else:
-                    time.sleep(5)
-                    response, body = self.request(fullurl, method, **kwargs)
+                    raise cloudlb.errors.RateLimit(5])
             except:
                 raise
             else:
-                if (retry - now) > datetime.timedelta(seconds=10):
-                    raise cloudlb.errors.RateLimit((retry - now))
-                else:
-                    time.sleep((retry - now).seconds)
-                    response, body = self.request(fullurl, method, **kwargs)
+                raise cloudlb.errors.RateLimit((retry - now))
 
         if body:
             try:
