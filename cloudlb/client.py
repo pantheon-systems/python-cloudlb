@@ -130,7 +130,7 @@ class CLBClient(httplib2.Http):
                 if response['retry-after']:
                     raise cloudlb.errors.RateLimit(response['retry-after'])
                 else:
-                    raise cloudlb.errors.RateLimit(5])
+                    raise cloudlb.errors.RateLimit(5)
             except:
                 raise
             else:
