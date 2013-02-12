@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 __author__ = "Chmouel Boudjnah <chmouel@chmouel.com>"
-VERSION = "0.5.1pantheon3"
+VERSION = "0.5.1pantheon.3"
 USER_AGENT = 'python-cloudb/%s' % VERSION
 
 # Default AUTH SERVER
