@@ -44,8 +44,7 @@ class SSLTermination(object):
             try:
                 setattr(self, key[0], value)
             except IndexError:
-                print skey, repr(key)
-                raise
+                print "Unexpected or missing key on API response: ", skey, repr(key)
         if 'intermediateCertificate' in sslt.keys():
             self.intermediate = sslt['intermediateCertificate']
         else:
