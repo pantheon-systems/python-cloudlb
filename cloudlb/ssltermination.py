@@ -9,9 +9,10 @@ class SSLTermination(object):
                    'secureonly': 'secureTrafficOnly',
                    'certificate': 'certificate',
                    'intermediate': 'intermediateCertificate',
-                   'privatekey': 'privatekey'
+                   'privatekey': 'privatekey',
+                   'securityprotocols': 'securityProtocols'
                   }
-        
+
     def __repr__(self):
         try:
             return "<SSLTermination: port %s>" % self.port
@@ -37,6 +38,7 @@ class SSLTermination(object):
         except cloudlb.errors.NotFound:
             return None
         sslt = ret[1]['sslTermination']
+
         for (skey, value) in sslt.iteritems():
             key = [k for (k, v) in self.kwargs.iteritems() if v == skey]
             try:
@@ -49,13 +51,13 @@ class SSLTermination(object):
         else:
             self.intermediate = None
         return self
-        
+
     def update(self, **kwargs):
         """Update SSL Termination settings:
-        
-    Takes keyword args of items to update.  
-    
-    If you're updating the cert/key/intermediate certificate, 
+
+    Takes keyword args of items to update.
+
+    If you're updating the cert/key/intermediate certificate,
     you must provide all 3 keywords.
     """
         body = {}
