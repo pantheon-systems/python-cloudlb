@@ -66,14 +66,15 @@ class SSLTermination(object):
         self._put(body)
 
 
-    def add(self, port, privatekey, certificate, intermediate=None, enabled=True, secureonly=False):
+    def add(self, port, privatekey, certificate, intermediate=None, enabled=True, secureonly=False, securityprotocols=[{"securityProtocolName":"TLS_10","securityProtocolStatus":"DISABLED"}]):
         self.port = port
         self.enabled = enabled
         self.secureonly = secureonly
         self.privatekey = privatekey
         self.certificate = certificate
         self.intermediate = intermediate
-        body = {'securePort': self.port, 'enabled': self.enabled, 'secureTrafficOnly': self.secureonly}
+        self.securityprotocols = securityprotocols
+        body = {'securePort': self.port, 'enabled': self.enabled, 'secureTrafficOnly': self.secureonly, 'securityProtocols': self.securityprotocols}
         body['privatekey'] = self.privatekey
         body['certificate'] = self.certificate
         if self.intermediate != None:
